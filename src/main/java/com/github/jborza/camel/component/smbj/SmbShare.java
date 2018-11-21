@@ -189,12 +189,13 @@ public class SmbShare implements AutoCloseable {
     }
 
     public void rename(String from, String to) {
-        log.debug("Renaming [{}] to [{}]", from, to);
+        String updatedTo = to.replace("\\\\", "\\");
+        log.debug("Renaming [{}] to [{}]", from, updatedTo);
         session = connectSession();
         DfsResolutionResult resolvedFrom = resolvePlainPath(from);
-        DfsResolutionResult resolvedTo = resolvePlainPath(to);
+        DfsResolutionResult resolvedTo = resolvePlainPath(updatedTo);
         if (!resolvedFrom.getSmbPath().isOnSameShare(resolvedTo.getSmbPath())) {
-            throw new AttemptedRenameAcrossSharesException("Rename operation failed, " + from + " and " + to + " are on different shares!");
+            throw new AttemptedRenameAcrossSharesException("Rename operation failed, " + from + " and " + updatedTo + " are on different shares!");
         }
         DiskShare share = resolvedFrom.getDiskShare();
         EnumSet<AccessMask> renameAttributes = EnumSet.of(AccessMask.FILE_READ_ATTRIBUTES, AccessMask.DELETE, AccessMask.SYNCHRONIZE);

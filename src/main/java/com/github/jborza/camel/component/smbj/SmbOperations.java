@@ -17,6 +17,7 @@
 package com.github.jborza.camel.component.smbj;
 
 import com.github.jborza.camel.component.smbj.exceptions.FileAlreadyExistsException;
+import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.SmbConfig;
 import org.apache.camel.Exchange;
@@ -85,7 +86,7 @@ public class SmbOperations implements GenericFileOperations<SmbFile>, SmbShareFa
         try {
             smbClient.renameFile(from, to);
             return true;
-        } catch (IOException e) {
+        } catch (IOException | SMBApiException e) {
             throw new GenericFileOperationFailedException("Cannot rename file: " + from + " to:" + to, e);
         }
     }
