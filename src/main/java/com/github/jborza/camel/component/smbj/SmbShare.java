@@ -33,6 +33,8 @@ import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
 import org.apache.camel.util.IOHelper;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,6 +49,8 @@ import static com.github.jborza.camel.component.smbj.SmbConstants.CURRENT_DIRECT
 import static com.github.jborza.camel.component.smbj.SmbConstants.PARENT_DIRECTORY;
 
 public class SmbShare implements AutoCloseable {
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    
     private final SMBClient client;
     private final SmbConfiguration config;
     private final boolean dfs;
@@ -185,6 +189,7 @@ public class SmbShare implements AutoCloseable {
     }
 
     public void rename(String from, String to) {
+        log.debug("Renaming [{}] to [{}]", from, to);
         session = connectSession();
         DfsResolutionResult resolvedFrom = resolvePlainPath(from);
         DfsResolutionResult resolvedTo = resolvePlainPath(to);
@@ -194,7 +199,9 @@ public class SmbShare implements AutoCloseable {
         DiskShare share = resolvedFrom.getDiskShare();
         EnumSet<AccessMask> renameAttributes = EnumSet.of(AccessMask.FILE_READ_ATTRIBUTES, AccessMask.DELETE, AccessMask.SYNCHRONIZE);
         try (File file = share.openFile(resolvedFrom.getSmbPath().getPath(), renameAttributes, null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null)) {
+            log.debug("Performing rename of [{}] to [{}]", resolvedFrom.getSmbPath().getPath(), resolvedTo.getSmbPath().getPath());
             file.rename(resolvedTo.getSmbPath().getPath());
+            log.debug("Successfully renamed to [{}]", resolvedTo.getSmbPath().getPath());
         }
     }
 
