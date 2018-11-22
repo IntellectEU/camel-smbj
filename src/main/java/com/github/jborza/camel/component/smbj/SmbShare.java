@@ -189,7 +189,7 @@ public class SmbShare implements AutoCloseable {
     }
 
     public void rename(String from, String to) {
-        String updatedTo = to.replaceAll("\\\\", "\\");
+        String updatedTo = to.replaceFirst("\\\\", "\\");
         log.debug("Renaming [{}] to [{}]", from, updatedTo);
         session = connectSession();
         DfsResolutionResult resolvedFrom = resolvePlainPath(from);
